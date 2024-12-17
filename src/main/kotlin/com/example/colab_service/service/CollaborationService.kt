@@ -5,9 +5,7 @@ import java.util.*
 
 interface CollaborationService {
 
-    fun startSession(documentId: UUID, userId: String): SessionResponse
+    fun notifyEditStart(documentId: UUID, userId: String)
 
-    fun getActiveSessions(documentId: UUID): List<SessionResponse>
-
-    fun endSession(sessionId: UUID)
+    fun notifyEditEnd(documentId: UUID, userId: String)
 }

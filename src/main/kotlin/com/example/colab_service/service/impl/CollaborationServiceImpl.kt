@@ -1,38 +1,35 @@
 package com.example.colab_service.service.impl
 
-import com.example.colab_service.api.response.SessionResponse
-import com.example.colab_service.domain.model.CollaborationSession
-import com.example.colab_service.domain.repository.CollaborationSessionRepository
 import com.example.colab_service.service.CollaborationService
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import org.springframework.web.client.RestTemplate
 import java.util.*
 
 @Service
 class CollaborationServiceImpl(
-    private val sessionRepository: CollaborationSessionRepository
+    private val restTemplate: RestTemplate
 ) : CollaborationService {
 
-    override fun startSession(documentId: UUID, userId: String): SessionResponse {
-        val session = CollaborationSession(
-            documentId = documentId,
-            userId = userId
-        )
-        sessionRepository.save(session)
-        return SessionResponse(session.sessionId, session.documentId, session.userId, session.startTime)
+    private val documentServiceUrl = "http://document-service/api/documents"
+
+    override fun notifyEditStart(documentId: UUID, userId: String) {
+        println("User $userId started editing document $documentId")
+        //TODO Дополнительная логика: запись в базу данных или уведомления
     }
 
-    override fun getActiveSessions(documentId: UUID): List<SessionResponse> {
-        return sessionRepository.findByDocumentIdAndEndTimeIsNull(documentId)
-            .map { session ->
-                SessionResponse(session.sessionId, session.documentId, session.userId, session.startTime)
-            }
+    override fun notifyEditEnd(documentId: UUID, userId: String) {
+        println("User $userId finished editing document $documentId")
+        saveDocumentChanges(documentId, "Document updated by $userId")
     }
 
-    override fun endSession(sessionId: UUID) {
-        val session = sessionRepository.findById(sessionId)
-            .orElseThrow { IllegalArgumentException("Session not found") }
-        session.endTime = LocalDateTime.now()
-        sessionRepository.save(session)
+    private fun saveDocumentChanges(documentId: UUID, changes: String) {
+        val request = mapOf("updates" to changes)
+        restTemplate.put("$documentServiceUrl/$documentId", request)
+        println("Changes saved for document $documentId")
+    }
+
+    fun getDocumentContent(documentId: UUID): String {
+        val response = restTemplate.getForEntity("$documentServiceUrl/$documentId", String::class.java)
+        return response.body ?: "No content"
     }
 }

@@ -2,7 +2,7 @@ spring:
   application:
     name: colab-service
   datasource:
-    url: ${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5440/postgres}
+    url: ${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5441/postgres}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -10,3 +10,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+
+server:
+  port: 8081
