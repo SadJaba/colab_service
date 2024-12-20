@@ -15,7 +15,7 @@ class SessionController(
 
     @PostMapping("/sessions/start")
     fun startSession(@RequestBody request: StartSessionRequest): ResponseEntity<SessionResponse> {
-        val session = sessionService.startSession(request.documentId, request.userId)
+        val session = sessionService.startSession(request)
         return ResponseEntity.ok(session)
     }
 

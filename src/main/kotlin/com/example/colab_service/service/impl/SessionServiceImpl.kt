@@ -1,5 +1,6 @@
 package com.example.colab_service.service.impl
 
+import com.example.colab_service.api.request.StartSessionRequest
 import com.example.colab_service.api.response.SessionResponse
 import com.example.colab_service.domain.model.CollaborationSession
 import com.example.colab_service.domain.repository.CollaborationSessionRepository
@@ -13,10 +14,10 @@ class SessionServiceImpl(
     private val sessionRepository: CollaborationSessionRepository
 ) : SessionService {
 
-    override fun startSession(documentId: UUID, userId: String): SessionResponse {
+    override fun startSession(request: StartSessionRequest): SessionResponse {
         val session = CollaborationSession(
-            documentId = documentId,
-            userId = userId
+            documentId = request.documentId,
+            userId = request.userId
         )
         sessionRepository.save(session)
         return SessionResponse(session.sessionId, session.documentId, session.userId, session.startTime)
